@@ -1,0 +1,325 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="CheckWebsiteAvailability"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_MasterWebsite" Type="InArgument(x:String)" />
+    <x:Property Name="in_ExcelFilePath" Type="InArgument(x:String)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>CheckWebsiteAvailability_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="CheckWebsiteAvailability" sap2010:WorkflowViewState.IdRef="Sequence_3">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="Website" />
+      <Variable x:TypeArguments="x:String" Name="PageHTML" />
+      <Variable x:TypeArguments="x:Int32" Name="StartNum" />
+      <Variable x:TypeArguments="ui:GenericValue" Name="ArrayMeasure" />
+      <Variable x:TypeArguments="s:String[]" Name="MeasureArray" />
+      <Variable x:TypeArguments="ui:GenericValue" Name="ArrayLength" />
+      <Variable x:TypeArguments="sd:DataTable" Name="WebAddressDT" />
+      <Variable x:TypeArguments="sd:DataTable" Name="MasterWebAddressDT" />
+      <Variable x:TypeArguments="x:Int32" Name="NewUrlCount" />
+      <Variable x:TypeArguments="x:Int32" Default="0" Name="UrlCount" />
+      <Variable x:TypeArguments="sd:DataTable" Name="AllWebAddressDT" />
+    </Sequence.Variables>
+    <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke GetWebsiteURLs workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="ReviewURL.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_WebsiteURL">[in_MasterWebsite]</InArgument>
+        <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_WebAddressDT">[WebAddressDT]</OutArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_ExcelFilePath">[in_ExcelFilePath]</InArgument>
+        <InArgument x:TypeArguments="x:String" x:Key="in_MasterWebsite">[in_MasterWebsite]</InArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+    <ui:FilterDataTable DataTable="[WebAddressDT]" DisplayName="Filter external sites" FilterRowsMode="Remove" sap2010:WorkflowViewState.IdRef="FilterDataTable_1" OutputDataTable="[MasterWebAddressDT]" SelectColumnsMode="Keep">
+      <ui:FilterDataTable.Filters>
+        <scg:List x:TypeArguments="ui:FilterOperationArgument" Capacity="8">
+          <ui:FilterOperationArgument BooleanOperator="And" Operator="NOTSTARTSWITH">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">[in_MasterWebsite]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">["@"]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">["javascript:"]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">["Javascript:"]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">["/#"]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">["tel:"]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+          <ui:FilterOperationArgument BooleanOperator="Or" Operator="EQ">
+            <ui:FilterOperationArgument.Column>
+              <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+            </ui:FilterOperationArgument.Column>
+            <ui:FilterOperationArgument.Operand>
+              <InArgument x:TypeArguments="x:String">[in_MasterWebsite]</InArgument>
+            </ui:FilterOperationArgument.Operand>
+          </ui:FilterOperationArgument>
+        </scg:List>
+      </ui:FilterDataTable.Filters>
+      <ui:FilterDataTable.SelectColumns>
+        <scg:List x:TypeArguments="InArgument" Capacity="4">
+          <x:Null />
+        </scg:List>
+      </ui:FilterDataTable.SelectColumns>
+    </ui:FilterDataTable>
+    <ui:RemoveDuplicateRows DataTable="[MasterWebAddressDT]" DisplayName="Remove Duplicate Urls" sap2010:WorkflowViewState.IdRef="RemoveDuplicateRows_1" OutputDataTable="[MasterWebAddressDT]" />
+    <Assign DisplayName="Get URL count" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Int32">[NewUrlCount]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Int32">[MasterWebAddressDT.Rows.Count]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <While DisplayName="Navigate to Each URL found" sap2010:WorkflowViewState.IdRef="While_1" Condition="[UrlCount &lt; NewUrlCount]">
+      <Sequence sap2010:WorkflowViewState.IdRef="Sequence_2">
+        <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke GetWebsiteURLs workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="ReviewURL.xaml">
+          <ui:InvokeWorkflowFile.Arguments>
+            <InArgument x:TypeArguments="x:String" x:Key="in_WebsiteURL">[MasterWebAddressDT.Rows(UrlCount).Item("WebAddress").ToString]</InArgument>
+            <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_WebAddressDT">[WebAddressDT]</OutArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_ExcelFilePath">[in_ExcelFilePath]</InArgument>
+            <InArgument x:TypeArguments="x:String" x:Key="in_MasterWebsite">[in_MasterWebsite]</InArgument>
+          </ui:InvokeWorkflowFile.Arguments>
+        </ui:InvokeWorkflowFile>
+        <ui:FilterDataTable DataTable="[WebAddressDT]" DisplayName="Filter external sites" FilterRowsMode="Remove" sap2010:WorkflowViewState.IdRef="FilterDataTable_2" OutputDataTable="[WebAddressDT]" SelectColumnsMode="Keep">
+          <ui:FilterDataTable.Filters>
+            <scg:List x:TypeArguments="ui:FilterOperationArgument" Capacity="8">
+              <ui:FilterOperationArgument BooleanOperator="And" Operator="NOTSTARTSWITH">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">[in_MasterWebsite]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">["javascript:"]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">["@"]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">["Javascript:"]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">["/#"]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="CONTAINS">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">["tel:"]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+              <ui:FilterOperationArgument BooleanOperator="Or" Operator="EQ">
+                <ui:FilterOperationArgument.Column>
+                  <InArgument x:TypeArguments="x:String">["WebAddress"]</InArgument>
+                </ui:FilterOperationArgument.Column>
+                <ui:FilterOperationArgument.Operand>
+                  <InArgument x:TypeArguments="x:String">[in_MasterWebsite]</InArgument>
+                </ui:FilterOperationArgument.Operand>
+              </ui:FilterOperationArgument>
+            </scg:List>
+          </ui:FilterDataTable.Filters>
+          <ui:FilterDataTable.SelectColumns>
+            <scg:List x:TypeArguments="InArgument" Capacity="4">
+              <x:Null />
+            </scg:List>
+          </ui:FilterDataTable.SelectColumns>
+        </ui:FilterDataTable>
+        <ui:RemoveDuplicateRows DataTable="[WebAddressDT]" DisplayName="Remove Duplicate temp Urls" sap2010:WorkflowViewState.IdRef="RemoveDuplicateRows_2" OutputDataTable="[WebAddressDT]" />
+        <ui:ForEachRow CurrentIndex="{x:Null}" DataTable="[WebAddressDT]" DisplayName="For Each Row" sap2010:WorkflowViewState.IdRef="ForEachRow_1">
+          <ui:ForEachRow.Body>
+            <ActivityAction x:TypeArguments="sd:DataRow">
+              <ActivityAction.Argument>
+                <DelegateInArgument x:TypeArguments="sd:DataRow" Name="row" />
+              </ActivityAction.Argument>
+              <Sequence DisplayName="Body" sap2010:WorkflowViewState.IdRef="Sequence_1">
+                <If Condition="[MasterWebAddressDT.AsEnumerable.Any(Function(x) x(&quot;WebAddress&quot;).ToString = row(&quot;WebAddress&quot;).ToString) or MasterWebAddressDT.AsEnumerable.Any(Function(x) x(&quot;WebAddress&quot;).ToString + &quot;/&quot; = row(&quot;WebAddress&quot;).ToString)]" sap2010:WorkflowViewState.IdRef="If_1">
+                  <If.Else>
+                    <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{row(0), row(1), row(2), row(3)}]" DataTable="[MasterWebAddressDT]" DisplayName="Add To Master" sap2010:WorkflowViewState.IdRef="AddDataRow_1" />
+                  </If.Else>
+                </If>
+              </Sequence>
+            </ActivityAction>
+          </ui:ForEachRow.Body>
+        </ui:ForEachRow>
+        <Assign DisplayName="Get New URL count" sap2010:WorkflowViewState.IdRef="Assign_3">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:Int32">[NewUrlCount]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:Int32">[MasterWebAddressDT.Rows.Count]</InArgument>
+          </Assign.Value>
+        </Assign>
+        <Assign DisplayName="Add an increment to url count" sap2010:WorkflowViewState.IdRef="Assign_4">
+          <Assign.To>
+            <OutArgument x:TypeArguments="x:Int32">[UrlCount]</OutArgument>
+          </Assign.To>
+          <Assign.Value>
+            <InArgument x:TypeArguments="x:Int32">[UrlCount+1]</InArgument>
+          </Assign.Value>
+        </Assign>
+      </Sequence>
+    </While>
+    <sads:DebugSymbol.Symbol>d1ZDOlxVc2Vyc1xjc3RhYXRzXERvY3VtZW50c1xVaVBhdGhcV2Vic2l0ZUF2YWxpYWJsaXR5VGVzdFxDaGVja1dlYnNpdGVBdmFpbGFiaWxpdHkueGFtbEpDA5YCDgIBAU4zTjYCAQJRBVgdAgFcWQWbARoCAUecAQWcAcMBAgFCnQEFpAEOAgE+pQEFlAINAgEDVE5UXAIBZFNGU1gCAWJVSVVbAgFgVklWWwIBXlG7AVHLAQIBXXY2dkQCAVt5NnlFAgFabjZuRAIBWXE2cUUCAVhmNmZEAgFXaTZpOwIBVl42XkQCAVVhNmFIAgFTWbQBWcoBAgFRkQE2kQFIAgFPjgE2jgFEAgFOWSNZMwIBTIkBNokBPgIBS4YBNoYBRAIBSoEBNoEBPAIBSX42fkQCAUicAaoBnAHAAQIBRZwBJ5wBPQIBQ6IBL6IBTgIBQZ8BMJ8BPQIBP6YBB5MCEgIBB6UBaaUBhgECAQSnAQmuASECATWvAQnxAR4CASDyAQnyAcABAgEb8wEJggIZAgERgwIJigISAgENiwIJkgISAgEIqgFSqgFgAgE8qQFKqQGJAQIBO6sBTasBXwIBOawBTawBXwIBN6cBvwGnAc8BAgE2zAE6zAFIAgE0zwE6zwFJAgEzxAE6xAFIAgEyxwE6xwE/AgExvAE6vAFIAgEwvwE6vwFJAgEvtAE6tAFIAgEutwE6twFMAgEsrwG4Aa8ByAECASrnATrnAUwCASjkATrkAUgCASevASevATcCASXfATrfAUICASTcATrcAUgCASPXATrXAUACASLUATrUAUgCASHyAa0B8gG9AQIBHvIBK/IBOwIBHPMBOvMBSgIBGfkBD/8BGgIBEogCM4gCUgIBEIUCNIUCQQIBDpACM5ACPwIBC40CNI0CPgIBCfoBEf4BFgIBE/oBH/oBqwICART8ARX8AdMBAgEV/AFv/AGFAQIBF/wBQPwBZAIBFg==</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_1" sap:VirtualizedContainerService.HintSize="564,87" />
+      <sap2010:ViewStateData Id="FilterDataTable_1" sap:VirtualizedContainerService.HintSize="564,59" />
+      <sap2010:ViewStateData Id="RemoveDuplicateRows_1" sap:VirtualizedContainerService.HintSize="564,22" />
+      <sap2010:ViewStateData Id="Assign_2" sap:VirtualizedContainerService.HintSize="564,60" />
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_2" sap:VirtualizedContainerService.HintSize="516,87" />
+      <sap2010:ViewStateData Id="FilterDataTable_2" sap:VirtualizedContainerService.HintSize="516,59" />
+      <sap2010:ViewStateData Id="RemoveDuplicateRows_2" sap:VirtualizedContainerService.HintSize="516,22" />
+      <sap2010:ViewStateData Id="AddDataRow_1" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="464,208" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="486,332">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ForEachRow_1" sap:VirtualizedContainerService.HintSize="516,480" />
+      <sap2010:ViewStateData Id="Assign_3" sap:VirtualizedContainerService.HintSize="516,60" />
+      <sap2010:ViewStateData Id="Assign_4" sap:VirtualizedContainerService.HintSize="516,60" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="538,1092">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="While_1" sap:VirtualizedContainerService.HintSize="564,1250">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_3" sap:VirtualizedContainerService.HintSize="586,1762">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="CheckWebsiteAvailability_1" sap:VirtualizedContainerService.HintSize="626,1842" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

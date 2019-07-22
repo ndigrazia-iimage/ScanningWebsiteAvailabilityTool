@@ -1,0 +1,987 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="GetWebsiteURLs"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_WebsiteURL" Type="InArgument(x:String)" />
+    <x:Property Name="out_WebAddressDT" Type="OutArgument(sd:DataTable)" />
+    <x:Property Name="in_ExcelFilePath" Type="InArgument(x:String)" />
+    <x:Property Name="in_MasterWebsite" Type="InArgument(x:String)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>GetURL2_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Plugin.Workflow</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="GetWebsiteURLs" sap2010:WorkflowViewState.IdRef="Sequence_19">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="PageHTML" />
+      <Variable x:TypeArguments="ui:GenericValue" Name="ArrayLength" />
+      <Variable x:TypeArguments="x:Int32" Name="StartNum" />
+      <Variable x:TypeArguments="s:String[]" Name="possibleSTR" />
+      <Variable x:TypeArguments="x:String" Default="N/A" Name="errorCode" />
+      <Variable x:TypeArguments="x:String" Default="Passed" Name="pageStatus" />
+      <Variable x:TypeArguments="sd:DataTable" Name="ElementTypeDT" />
+      <Variable x:TypeArguments="x:String" Name="PageTitle" />
+      <Variable x:TypeArguments="sd:DataTable" Name="ElementSheetDT" />
+      <Variable x:TypeArguments="sd:DataTable" Name="WebAddressDT" />
+      <Variable x:TypeArguments="x:String" Name="subSiteURL" />
+      <Variable x:TypeArguments="x:String" Name="rootSubSiteURL" />
+      <Variable x:TypeArguments="x:String" Name="LandingPageUrl" />
+    </Sequence.Variables>
+    <ui:OpenBrowser UiBrowser="{x:Null}" BrowserType="Chrome" DisplayName="Open Passed in URL" Hidden="False" sap2010:WorkflowViewState.IdRef="OpenBrowser_1" NewSession="True" Private="False" Url="[in_WebsiteURL]">
+      <ui:OpenBrowser.Body>
+        <ActivityAction x:TypeArguments="x:Object">
+          <ActivityAction.Argument>
+            <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
+          </ActivityAction.Argument>
+          <Sequence sap2010:WorkflowViewState.IdRef="Sequence_18">
+            <Sequence DisplayName="Do" sap2010:WorkflowViewState.IdRef="Sequence_16">
+              <ui:GetAttribute ContinueOnError="{x:Null}" Attribute="outerHtml" DisplayName="Get URL outerHTML" sap2010:WorkflowViewState.IdRef="GetAttribute_1">
+                <ui:GetAttribute.Result>
+                  <OutArgument x:TypeArguments="x:String">[PageHTML]</OutArgument>
+                </ui:GetAttribute.Result>
+                <ui:GetAttribute.Target>
+                  <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="548a01e5de71059461c02e0fadca156a" Selector="&lt;webctrl idx='1' tag='HTML' /&gt;" WaitForReady="INTERACTIVE" />
+                </ui:GetAttribute.Target>
+              </ui:GetAttribute>
+              <ui:GetAttribute ContinueOnError="{x:Null}" Attribute="title" DisplayName="Get URL Title" sap2010:WorkflowViewState.IdRef="GetAttribute_2">
+                <ui:GetAttribute.Result>
+                  <OutArgument x:TypeArguments="x:String">[PageTitle]</OutArgument>
+                </ui:GetAttribute.Result>
+                <ui:GetAttribute.Target>
+                  <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="548a01e5de71059461c02e0fadca156a" Selector="&lt;webctrl idx='1' tag='HTML' /&gt;" WaitForReady="INTERACTIVE" />
+                </ui:GetAttribute.Target>
+              </ui:GetAttribute>
+              <ui:GetAttribute ContinueOnError="{x:Null}" Attribute="url" DisplayName="Get Attribute" sap2010:WorkflowViewState.IdRef="GetAttribute_4">
+                <ui:GetAttribute.Result>
+                  <OutArgument x:TypeArguments="x:String">[LandingPageUrl]</OutArgument>
+                </ui:GetAttribute.Result>
+                <ui:GetAttribute.Target>
+                  <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" Selector="{x:Null}" TimeoutMS="{x:Null}" WaitForReady="INTERACTIVE" />
+                </ui:GetAttribute.Target>
+              </ui:GetAttribute>
+              <Sequence DisplayName="Assign sub site URLS" sap2010:WorkflowViewState.IdRef="Sequence_32">
+                <Assign DisplayName="Create for./ occurence" sap2010:WorkflowViewState.IdRef="Assign_49">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[subSiteURL]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[LandingPageUrl.Substring(0, LandingPageUrl.LastIndexOf("/"))]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Create for ../ occurence" sap2010:WorkflowViewState.IdRef="Assign_50">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[rootSubSiteURL]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[subSiteURL.Substring(0, subSiteURL.LastIndexOf("/"))]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Create for ../ occurence" sap2010:WorkflowViewState.IdRef="Assign_51">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[rootSubSiteURL]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[subSiteURL.Substring(0, subSiteURL.LastIndexOf("/"))]</InArgument>
+                  </Assign.Value>
+                </Assign>
+              </Sequence>
+              <ui:BuildDataTable DataTable="[out_WebAddressDT]" DisplayName="Build Output Data Table" sap2010:WorkflowViewState.IdRef="BuildDataTable_1" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainDataTable=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;HomeURL&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;WebAddress&quot; minOccurs=&quot;0&quot;&gt;&#xA;                  &lt;xs:simpleType&gt;&#xA;                    &lt;xs:restriction base=&quot;xs:string&quot;&gt;&#xA;                      &lt;xs:maxLength value=&quot;1000&quot; /&gt;&#xA;                    &lt;/xs:restriction&gt;&#xA;                  &lt;/xs:simpleType&gt;&#xA;                &lt;/xs:element&gt;&#xA;                &lt;xs:element name=&quot;PageStatus&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ErrorCode&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;" />
+              <ui:BuildDataTable DataTable="[WebAddressDT]" DisplayName="Build Excel Output Data Table" sap2010:WorkflowViewState.IdRef="BuildDataTable_4" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainDataTable=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;HomeURL&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;WebAddress&quot; minOccurs=&quot;0&quot;&gt;&#xA;                  &lt;xs:simpleType&gt;&#xA;                    &lt;xs:restriction base=&quot;xs:string&quot;&gt;&#xA;                      &lt;xs:maxLength value=&quot;1000&quot; /&gt;&#xA;                    &lt;/xs:restriction&gt;&#xA;                  &lt;/xs:simpleType&gt;&#xA;                &lt;/xs:element&gt;&#xA;                &lt;xs:element name=&quot;PageStatus&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ErrorCode&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;" />
+              <ui:BuildDataTable DataTable="[ElementSheetDT]" DisplayName="Build Output  Element Sheet Data Table" sap2010:WorkflowViewState.IdRef="BuildDataTable_2" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainDataTable=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;HomeURL&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;WebAddress&quot; minOccurs=&quot;0&quot;&gt;&#xA;                  &lt;xs:simpleType&gt;&#xA;                    &lt;xs:restriction base=&quot;xs:string&quot;&gt;&#xA;                      &lt;xs:maxLength value=&quot;1000&quot; /&gt;&#xA;                    &lt;/xs:restriction&gt;&#xA;                  &lt;/xs:simpleType&gt;&#xA;                &lt;/xs:element&gt;&#xA;                &lt;xs:element name=&quot;PageStatus&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ErrorCode&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ElementType&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ElementName&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;" />
+              <ui:BuildDataTable DataTable="[ElementTypeDT]" DisplayName="Build DataTable for two element fields" sap2010:WorkflowViewState.IdRef="BuildDataTable_3" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainDataTable=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;ElementType&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;ElementName&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;" />
+              <Sequence DisplayName="Check for Error" sap2010:WorkflowViewState.IdRef="Sequence_15">
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_56">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[PageTitle]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[PageTitle.Replace("Error","").Trim]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign DisplayName="Error Handle checks" sap2010:WorkflowViewState.IdRef="Assign_1">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="s:String[]">[possibleSTR]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="s:String[]">[{"400","401","403","404","500","502","503","504"}]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Switch x:TypeArguments="x:String" DisplayName="Switch Check which error code" Expression="[possibleSTR.FirstOrDefault(Function(s) PageTitle.ToString.StartsWith(s))]" sap2010:WorkflowViewState.IdRef="Switch`1_2">
+                  <Switch.Default>
+                    <Sequence DisplayName="Break out urls to Datatable" sap2010:WorkflowViewState.IdRef="Sequence_11">
+                      <If Condition="[LandingPageUrl.Contains(in_MasterWebsite)]" sap2010:WorkflowViewState.IdRef="If_9">
+                        <If.Then>
+                          <Sequence sap2010:WorkflowViewState.IdRef="Sequence_20">
+                            <Assign DisplayName="Substring to &lt;body&gt;" sap2010:WorkflowViewState.IdRef="Assign_2">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:String">[PageHTML]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:String">[PageHTML.Substring(PageHTML.IndexOf("&lt;body")).ToString]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <Assign DisplayName="Assign Start Num" sap2010:WorkflowViewState.IdRef="Assign_3">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:Int32">[StartNum]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:Int32">1</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <Assign DisplayName="Assign Array Length" sap2010:WorkflowViewState.IdRef="Assign_4">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="ui:GenericValue">[ArrayLength]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="ui:GenericValue">[PageHTML.Split({"href="""} , System.StringSplitOptions.None).GetLength(0).ToString]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <If Condition="[ArrayLength = 1]" DisplayName="If No Urls on page" sap2010:WorkflowViewState.IdRef="If_6">
+                              <If.Then>
+                                <Sequence DisplayName="Determine if broken page" sap2010:WorkflowViewState.IdRef="Sequence_5">
+                                  <Sequence DisplayName="Check for Error" sap2010:WorkflowViewState.IdRef="Sequence_4">
+                                    <Assign DisplayName="Error Handle checks" sap2010:WorkflowViewState.IdRef="Assign_5">
+                                      <Assign.To>
+                                        <OutArgument x:TypeArguments="s:String[]">[possibleSTR]</OutArgument>
+                                      </Assign.To>
+                                      <Assign.Value>
+                                        <InArgument x:TypeArguments="s:String[]">[{"400","401","403","404","500","502","503","504"}]</InArgument>
+                                      </Assign.Value>
+                                    </Assign>
+                                    <If Condition="[PageHTML.Contains(&quot;Server Error&quot;)]" sap2010:WorkflowViewState.IdRef="If_1">
+                                      <If.Then>
+                                        <Sequence DisplayName="Add Error codes" sap2010:WorkflowViewState.IdRef="Sequence_1">
+                                          <Switch x:TypeArguments="x:String" DisplayName="Switch" Expression="[possibleSTR.FirstOrDefault(Function(s) PageHTML.ToString.Contains(s))]" sap2010:WorkflowViewState.IdRef="Switch`1_1">
+                                            <Switch.Default>
+                                              <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+                                                <Assign.To>
+                                                  <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                                </Assign.To>
+                                                <Assign.Value>
+                                                  <InArgument x:TypeArguments="x:String">["Server Error"]</InArgument>
+                                                </Assign.Value>
+                                              </Assign>
+                                            </Switch.Default>
+                                            <Assign x:Key="400" sap2010:WorkflowViewState.IdRef="Assign_7">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">400</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="401" sap2010:WorkflowViewState.IdRef="Assign_8">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">401</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="403" sap2010:WorkflowViewState.IdRef="Assign_9">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">403</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="404" sap2010:WorkflowViewState.IdRef="Assign_10">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">404</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="500" sap2010:WorkflowViewState.IdRef="Assign_11">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">500</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="502" sap2010:WorkflowViewState.IdRef="Assign_12">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">502</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="503" sap2010:WorkflowViewState.IdRef="Assign_13">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">503</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                            <Assign x:Key="504" sap2010:WorkflowViewState.IdRef="Assign_14">
+                                              <Assign.To>
+                                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                              </Assign.To>
+                                              <Assign.Value>
+                                                <InArgument x:TypeArguments="x:String">504</InArgument>
+                                              </Assign.Value>
+                                            </Assign>
+                                          </Switch>
+                                          <Assign DisplayName="Assign Failed Status" sap2010:WorkflowViewState.IdRef="Assign_15">
+                                            <Assign.To>
+                                              <OutArgument x:TypeArguments="x:String">[pageStatus]</OutArgument>
+                                            </Assign.To>
+                                            <Assign.Value>
+                                              <InArgument x:TypeArguments="x:String">Failed</InArgument>
+                                            </Assign.Value>
+                                          </Assign>
+                                        </Sequence>
+                                      </If.Then>
+                                      <If.Else>
+                                        <ui:CommentOut DisplayName="Comment Out" sap2010:WorkflowViewState.IdRef="CommentOut_1">
+                                          <ui:CommentOut.Body>
+                                            <Sequence DisplayName="Ignored Activities" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                                              <Sequence sap2010:WorkflowViewState.IdRef="Sequence_2">
+                                                <Assign sap2010:WorkflowViewState.IdRef="Assign_16">
+                                                  <Assign.To>
+                                                    <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                                                  </Assign.To>
+                                                  <Assign.Value>
+                                                    <InArgument x:TypeArguments="x:String">N/A</InArgument>
+                                                  </Assign.Value>
+                                                </Assign>
+                                                <Assign DisplayName="Assign Failed Status" sap2010:WorkflowViewState.IdRef="Assign_17">
+                                                  <Assign.To>
+                                                    <OutArgument x:TypeArguments="x:String">[pageStatus]</OutArgument>
+                                                  </Assign.To>
+                                                  <Assign.Value>
+                                                    <InArgument x:TypeArguments="x:String">Passed</InArgument>
+                                                  </Assign.Value>
+                                                </Assign>
+                                              </Sequence>
+                                            </Sequence>
+                                          </ui:CommentOut.Body>
+                                        </ui:CommentOut>
+                                      </If.Else>
+                                    </If>
+                                  </Sequence>
+                                  <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteUrl,&quot;Root URL&quot;, pageStatus, errorCode}]" DataTable="[WebAddressDT]" DisplayName="Add Excel Master DT" sap2010:WorkflowViewState.IdRef="AddDataRow_1" />
+                                </Sequence>
+                              </If.Then>
+                              <If.Else>
+                                <Sequence sap2010:WorkflowViewState.IdRef="Sequence_10">
+                                  <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteUrl,&quot;Root URL&quot;, pageStatus, errorCode}]" DataTable="[WebAddressDT]" DisplayName="Add Excel Master DT" sap2010:WorkflowViewState.IdRef="AddDataRow_2" />
+                                  <While sap2010:WorkflowViewState.IdRef="While_1">
+                                    <While.Variables>
+                                      <Variable x:TypeArguments="x:String" Name="HREFValue" />
+                                      <Variable x:TypeArguments="x:String" Name="HREFSplit" />
+                                    </While.Variables>
+                                    <While.Condition>[StartNum &lt; ArrayLength]</While.Condition>
+                                    <Sequence DisplayName="Loop through each href" sap2010:WorkflowViewState.IdRef="Sequence_9">
+                                      <Assign sap2010:WorkflowViewState.IdRef="Assign_18">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[HREFSplit]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">[(PageHTML.Split({"href="""},System.StringSplitOptions.None)(StartNum).Trim)]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <Assign DisplayName="Assign" sap2010:WorkflowViewState.IdRef="Assign_19">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">[HREFSplit.Substring(0, HREFSplit.indexOf(""""))]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <If Condition="[HREFValue.StartsWith(&quot;//&quot;)]" DisplayName="If url starts with //" sap2010:WorkflowViewState.IdRef="If_14">
+                                        <If.Then>
+                                          <Assign sap2010:WorkflowViewState.IdRef="Assign_55">
+                                            <Assign.To>
+                                              <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                            </Assign.To>
+                                            <Assign.Value>
+                                              <InArgument x:TypeArguments="x:String">[in_MasterWebsite.Substring(0,in_MasterWebsite.IndexOf("//")) + HREFValue.Replace("//","//www.")]</InArgument>
+                                            </Assign.Value>
+                                          </Assign>
+                                        </If.Then>
+                                      </If>
+                                      <If Condition="[HREFValue.Contains(&quot;http:&quot;) or HREFValue.StartsWith(in_MasterWebsite) or HREFValue.Contains(&quot;https:&quot;)]" sap2010:WorkflowViewState.IdRef="If_5">
+                                        <If.Else>
+                                          <Sequence sap2010:WorkflowViewState.IdRef="Sequence_6">
+                                            <If Condition="[HREFValue.StartsWith(&quot;/&quot;)]" sap2010:WorkflowViewState.IdRef="If_3">
+                                              <If.Then>
+                                                <Sequence sap2010:WorkflowViewState.IdRef="Sequence_28">
+                                                  <Assign DisplayName="Assign" sap2010:WorkflowViewState.IdRef="Assign_21">
+                                                    <Assign.To>
+                                                      <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                    </Assign.To>
+                                                    <Assign.Value>
+                                                      <InArgument x:TypeArguments="x:String">[in_MasterWebsite.Substring(0, in_MasterWebsite.LastIndexOf("/")) + HREFValue]</InArgument>
+                                                    </Assign.Value>
+                                                  </Assign>
+                                                </Sequence>
+                                              </If.Then>
+                                              <If.Else>
+                                                <Sequence DisplayName="Logic to assign root url" sap2010:WorkflowViewState.IdRef="Sequence_25">
+                                                  <If Condition="[HREFValue.StartsWith(&quot;..&quot;)]" DisplayName="If 2 . in URL" sap2010:WorkflowViewState.IdRef="If_2">
+                                                    <If.Then>
+                                                      <Sequence DisplayName="Assign as a root sub site" sap2010:WorkflowViewState.IdRef="Sequence_22">
+                                                        <Assign DisplayName="Remove first 2 chars in string" sap2010:WorkflowViewState.IdRef="Assign_53">
+                                                          <Assign.To>
+                                                            <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                          </Assign.To>
+                                                          <Assign.Value>
+                                                            <InArgument x:TypeArguments="x:String">[HREFValue.Substring(2)]</InArgument>
+                                                          </Assign.Value>
+                                                        </Assign>
+                                                        <Assign DisplayName="Create new URL" sap2010:WorkflowViewState.IdRef="Assign_44">
+                                                          <Assign.To>
+                                                            <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                          </Assign.To>
+                                                          <Assign.Value>
+                                                            <InArgument x:TypeArguments="x:String">[rootSubSiteURL + HREFValue]</InArgument>
+                                                          </Assign.Value>
+                                                        </Assign>
+                                                      </Sequence>
+                                                    </If.Then>
+                                                    <If.Else>
+                                                      <Sequence DisplayName="Add sub root URL" sap2010:WorkflowViewState.IdRef="Sequence_24">
+                                                        <If Condition="[HREFValue.StartsWith(&quot;.&quot;)]" DisplayName="If 1 . in URL" sap2010:WorkflowViewState.IdRef="If_12">
+                                                          <If.Then>
+                                                            <Sequence DisplayName="Assign as a subSite to website passed in" sap2010:WorkflowViewState.IdRef="Sequence_23">
+                                                              <Assign DisplayName="Remove first char in string" sap2010:WorkflowViewState.IdRef="Assign_54">
+                                                                <Assign.To>
+                                                                  <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                                </Assign.To>
+                                                                <Assign.Value>
+                                                                  <InArgument x:TypeArguments="x:String">[HREFValue.Substring(1)]</InArgument>
+                                                                </Assign.Value>
+                                                              </Assign>
+                                                              <Assign DisplayName="Create new URL" sap2010:WorkflowViewState.IdRef="Assign_45">
+                                                                <Assign.To>
+                                                                  <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                                </Assign.To>
+                                                                <Assign.Value>
+                                                                  <InArgument x:TypeArguments="x:String">[subSiteURL + HREFValue]</InArgument>
+                                                                </Assign.Value>
+                                                              </Assign>
+                                                            </Sequence>
+                                                          </If.Then>
+                                                          <If.Else>
+                                                            <Sequence sap2010:WorkflowViewState.IdRef="Sequence_27">
+                                                              <Assign DisplayName="Create new URL" sap2010:WorkflowViewState.IdRef="Assign_46">
+                                                                <Assign.To>
+                                                                  <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                                                </Assign.To>
+                                                                <Assign.Value>
+                                                                  <InArgument x:TypeArguments="x:String">[subSiteURL + "/" +HREFValue]</InArgument>
+                                                                </Assign.Value>
+                                                              </Assign>
+                                                            </Sequence>
+                                                          </If.Else>
+                                                        </If>
+                                                      </Sequence>
+                                                    </If.Else>
+                                                  </If>
+                                                </Sequence>
+                                              </If.Else>
+                                            </If>
+                                          </Sequence>
+                                        </If.Else>
+                                      </If>
+                                      <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteURL,HREFValue,&quot;&quot;,&quot;&quot;}]" DataTable="[WebAddressDT]" DisplayName="Add Excel Data Row" sap2010:WorkflowViewState.IdRef="AddDataRow_9" />
+                                      <If Condition="[HREFValue.Contains(&quot;/?&quot;)]" sap2010:WorkflowViewState.IdRef="If_11">
+                                        <If.Then>
+                                          <Assign sap2010:WorkflowViewState.IdRef="Assign_36">
+                                            <Assign.To>
+                                              <OutArgument x:TypeArguments="x:String">[HREFValue]</OutArgument>
+                                            </Assign.To>
+                                            <Assign.Value>
+                                              <InArgument x:TypeArguments="x:String">[HREFValue.Substring(0,HREFValue.IndexOf("/?")) + "/"]</InArgument>
+                                            </Assign.Value>
+                                          </Assign>
+                                        </If.Then>
+                                      </If>
+                                      <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{&quot;&quot;,HREFValue,&quot;&quot;,&quot;&quot;}]" DataTable="[out_WebAddressDT]" DisplayName="Add Output Data Row" sap2010:WorkflowViewState.IdRef="AddDataRow_8" />
+                                      <Assign sap2010:WorkflowViewState.IdRef="Assign_24">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:Int32">[StartNum]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:Int32">[StartNum + 1]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                    </Sequence>
+                                  </While>
+                                </Sequence>
+                              </If.Else>
+                            </If>
+                          </Sequence>
+                        </If.Then>
+                        <If.Else>
+                          <Sequence DisplayName="External Redirect" sap2010:WorkflowViewState.IdRef="Sequence_21">
+                            <Assign sap2010:WorkflowViewState.IdRef="Assign_35">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="x:String">External Redirect Page</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                          </Sequence>
+                        </If.Else>
+                      </If>
+                    </Sequence>
+                  </Switch.Default>
+                  <Assign x:Key="400" sap2010:WorkflowViewState.IdRef="Assign_25">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">400</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="401" sap2010:WorkflowViewState.IdRef="Assign_26">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">401</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="403" sap2010:WorkflowViewState.IdRef="Assign_27">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">403</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="404" sap2010:WorkflowViewState.IdRef="Assign_28">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">404</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="500" sap2010:WorkflowViewState.IdRef="Assign_29">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">500</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="502" sap2010:WorkflowViewState.IdRef="Assign_30">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">502</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="503" sap2010:WorkflowViewState.IdRef="Assign_31">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">503</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <Assign x:Key="504" sap2010:WorkflowViewState.IdRef="Assign_32">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:String">[errorCode]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:String">504</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                </Switch>
+                <If Condition="[errorCode =&quot;N/A&quot;]" DisplayName="If no error code on page" sap2010:WorkflowViewState.IdRef="If_7">
+                  <If.Then>
+                    <Sequence DisplayName="Get Elements on the page" sap2010:WorkflowViewState.IdRef="Sequence_13">
+                      <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke TestPageAttribute workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="GetPageAttribute.xaml">
+                        <ui:InvokeWorkflowFile.Arguments>
+                          <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_FormElementsDT">[ElementTypeDT]</OutArgument>
+                          <InArgument x:TypeArguments="x:String" x:Key="in_PageHTML">[PageHTML]</InArgument>
+                        </ui:InvokeWorkflowFile.Arguments>
+                      </ui:InvokeWorkflowFile>
+                      <ui:ForEachRow CurrentIndex="{x:Null}" DataTable="[ElementTypeDT]" DisplayName="Add Elements to a Datatable" sap2010:WorkflowViewState.IdRef="ForEachRow_1">
+                        <ui:ForEachRow.Body>
+                          <ActivityAction x:TypeArguments="sd:DataRow">
+                            <ActivityAction.Argument>
+                              <DelegateInArgument x:TypeArguments="sd:DataRow" Name="row" />
+                            </ActivityAction.Argument>
+                            <Sequence DisplayName="Body" sap2010:WorkflowViewState.IdRef="Sequence_12">
+                              <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteUrl,&quot;Root URL&quot;, pageStatus, errorCode, row(&quot;ElementType&quot;),row(&quot;ElementName&quot;)}]" DataTable="[ElementSheetDT]" DisplayName="Add Page Elements Data" sap2010:WorkflowViewState.IdRef="AddDataRow_5" />
+                            </Sequence>
+                          </ActivityAction>
+                        </ui:ForEachRow.Body>
+                      </ui:ForEachRow>
+                    </Sequence>
+                  </If.Then>
+                  <If.Else>
+                    <Sequence DisplayName="Add Errors to excel file" sap2010:WorkflowViewState.IdRef="Sequence_14">
+                      <If Condition="[errorCode =&quot;External Redirect Page&quot;]" sap2010:WorkflowViewState.IdRef="If_10">
+                        <If.Else>
+                          <Assign sap2010:WorkflowViewState.IdRef="Assign_33">
+                            <Assign.To>
+                              <OutArgument x:TypeArguments="x:String">[pageStatus]</OutArgument>
+                            </Assign.To>
+                            <Assign.Value>
+                              <InArgument x:TypeArguments="x:String">Failed</InArgument>
+                            </Assign.Value>
+                          </Assign>
+                        </If.Else>
+                      </If>
+                      <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteUrl,&quot;Root URL&quot;, pageStatus, errorCode}]" DataTable="[WebAddressDT]" DisplayName="Add Data For Error EXCEL" sap2010:WorkflowViewState.IdRef="AddDataRow_7" />
+                      <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{in_WebsiteUrl,&quot;Root URL&quot;, pageStatus, errorCode}]" DataTable="[out_WebAddressDT]" DisplayName="Add Data For Error" sap2010:WorkflowViewState.IdRef="AddDataRow_6" />
+                    </Sequence>
+                  </If.Else>
+                </If>
+              </Sequence>
+            </Sequence>
+            <ui:ExcelApplicationScope Password="{x:Null}" DisplayName="Write Datatable to Excel" sap2010:WorkflowViewState.IdRef="ExcelApplicationScope_1" WorkbookPath="[in_ExcelFilePath]">
+              <ui:ExcelApplicationScope.Body>
+                <ActivityAction x:TypeArguments="ui:WorkbookApplication">
+                  <ActivityAction.Argument>
+                    <DelegateInArgument x:TypeArguments="ui:WorkbookApplication" Name="ExcelWorkbookScope" />
+                  </ActivityAction.Argument>
+                  <Sequence DisplayName="Do" sap2010:WorkflowViewState.IdRef="Sequence_17">
+                    <ui:ExcelAppendRange DataTable="[WebAddressDT]" DisplayName="Append Range" sap2010:WorkflowViewState.IdRef="ExcelAppendRange_1" SheetName="Site Map" />
+                    <ui:ExcelAppendRange DataTable="[ElementSheetDT]" DisplayName="Append Range" sap2010:WorkflowViewState.IdRef="ExcelAppendRange_2" SheetName="Element per Page" />
+                    <ui:ExcelSelectRange DisplayName="Select Range" sap2010:WorkflowViewState.IdRef="ExcelSelectRange_1" Range="B1" SheetName="Summary" />
+                    <ui:ExcelSaveWorkbook DisplayName="Save Workbook" sap2010:WorkflowViewState.IdRef="ExcelSaveWorkbook_1" />
+                  </Sequence>
+                </ActivityAction>
+              </ui:ExcelApplicationScope.Body>
+            </ui:ExcelApplicationScope>
+            <If Condition="[in_MasterWebsite = in_WebsiteURL]" sap2010:WorkflowViewState.IdRef="If_13">
+              <If.Else>
+                <ui:CloseWindow Selector="{x:Null}" TimeoutMS="{x:Null}" UseWindow="{x:Null}" DisplayName="Close Window" sap2010:WorkflowViewState.IdRef="CloseWindow_1" WaitForReady="INTERACTIVE" />
+              </If.Else>
+            </If>
+          </Sequence>
+        </ActivityAction>
+      </ui:OpenBrowser.Body>
+    </ui:OpenBrowser>
+    <sads:DebugSymbol.Symbol>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</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="GetAttribute_1" sap:VirtualizedContainerService.HintSize="498,134" />
+      <sap2010:ViewStateData Id="GetAttribute_2" sap:VirtualizedContainerService.HintSize="498,134" />
+      <sap2010:ViewStateData Id="GetAttribute_4" sap:VirtualizedContainerService.HintSize="498,96" />
+      <sap2010:ViewStateData Id="Assign_49" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_50" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_51" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_32" sap:VirtualizedContainerService.HintSize="498,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="BuildDataTable_1" sap:VirtualizedContainerService.HintSize="498,59" />
+      <sap2010:ViewStateData Id="BuildDataTable_4" sap:VirtualizedContainerService.HintSize="498,59" />
+      <sap2010:ViewStateData Id="BuildDataTable_2" sap:VirtualizedContainerService.HintSize="498,59" />
+      <sap2010:ViewStateData Id="BuildDataTable_3" sap:VirtualizedContainerService.HintSize="498,59" />
+      <sap2010:ViewStateData Id="Assign_56" sap:VirtualizedContainerService.HintSize="476,60" />
+      <sap2010:ViewStateData Id="Assign_1" sap:VirtualizedContainerService.HintSize="476,60" />
+      <sap2010:ViewStateData Id="Assign_2" sap:VirtualizedContainerService.HintSize="1639,60" />
+      <sap2010:ViewStateData Id="Assign_3" sap:VirtualizedContainerService.HintSize="1639,60" />
+      <sap2010:ViewStateData Id="Assign_4" sap:VirtualizedContainerService.HintSize="1639,60" />
+      <sap2010:ViewStateData Id="Assign_5" sap:VirtualizedContainerService.HintSize="489,60" />
+      <sap2010:ViewStateData Id="Assign_6" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_7" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_8" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_9" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_10" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_11" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_12" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_13" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_14" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Switch`1_1" sap:VirtualizedContainerService.HintSize="242,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_15" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="264,275">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_16" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_17" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="200,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_3" sap:VirtualizedContainerService.HintSize="286,175">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="CommentOut_1" sap:VirtualizedContainerService.HintSize="200,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="489,423" />
+      <sap2010:ViewStateData Id="Sequence_4" sap:VirtualizedContainerService.HintSize="200,52">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="AddDataRow_1" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="Sequence_5" sap:VirtualizedContainerService.HintSize="222,238">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="AddDataRow_2" sap:VirtualizedContainerService.HintSize="1370,22" />
+      <sap2010:ViewStateData Id="Assign_18" sap:VirtualizedContainerService.HintSize="1322,60" />
+      <sap2010:ViewStateData Id="Assign_19" sap:VirtualizedContainerService.HintSize="1322,60" />
+      <sap2010:ViewStateData Id="Assign_55" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="If_14" sap:VirtualizedContainerService.HintSize="1322,210" />
+      <sap2010:ViewStateData Id="Assign_21" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_28" sap:VirtualizedContainerService.HintSize="264,184">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_53" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_44" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_22" sap:VirtualizedContainerService.HintSize="264,284">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_54" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_45" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_23" sap:VirtualizedContainerService.HintSize="264,284">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_46" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_27" sap:VirtualizedContainerService.HintSize="264,184">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_12" sap:VirtualizedContainerService.HintSize="553,434" />
+      <sap2010:ViewStateData Id="Sequence_24" sap:VirtualizedContainerService.HintSize="575,558">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_2" sap:VirtualizedContainerService.HintSize="864,708">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_25" sap:VirtualizedContainerService.HintSize="886,832">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_3" sap:VirtualizedContainerService.HintSize="1175,982" />
+      <sap2010:ViewStateData Id="Sequence_6" sap:VirtualizedContainerService.HintSize="1197,1106">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_5" sap:VirtualizedContainerService.HintSize="1322,1256" />
+      <sap2010:ViewStateData Id="AddDataRow_9" sap:VirtualizedContainerService.HintSize="1322,22" />
+      <sap2010:ViewStateData Id="Assign_36" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="If_11" sap:VirtualizedContainerService.HintSize="1322,210" />
+      <sap2010:ViewStateData Id="AddDataRow_8" sap:VirtualizedContainerService.HintSize="1322,22" />
+      <sap2010:ViewStateData Id="Assign_24" sap:VirtualizedContainerService.HintSize="1322,60" />
+      <sap2010:ViewStateData Id="Sequence_9" sap:VirtualizedContainerService.HintSize="1344,2304">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="While_1" sap:VirtualizedContainerService.HintSize="1370,2464">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_10" sap:VirtualizedContainerService.HintSize="1392,2650">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_6" sap:VirtualizedContainerService.HintSize="1639,2800">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_20" sap:VirtualizedContainerService.HintSize="1661,3224">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_35" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_21" sap:VirtualizedContainerService.HintSize="264,184">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_9" sap:VirtualizedContainerService.HintSize="1950,3374">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_11" sap:VirtualizedContainerService.HintSize="222,175">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_25" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_26" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_27" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_28" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_29" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_30" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_31" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_32" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Switch`1_2" sap:VirtualizedContainerService.HintSize="476,291">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_1" sap:VirtualizedContainerService.HintSize="314,87">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="AddDataRow_5" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="Sequence_12" sap:VirtualizedContainerService.HintSize="222,146">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ForEachRow_1" sap:VirtualizedContainerService.HintSize="314,294">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_13" sap:VirtualizedContainerService.HintSize="336,545">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_33" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="If_10" sap:VirtualizedContainerService.HintSize="464,208" />
+      <sap2010:ViewStateData Id="AddDataRow_7" sap:VirtualizedContainerService.HintSize="464,22" />
+      <sap2010:ViewStateData Id="AddDataRow_6" sap:VirtualizedContainerService.HintSize="464,22" />
+      <sap2010:ViewStateData Id="Sequence_14" sap:VirtualizedContainerService.HintSize="486,456">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_7" sap:VirtualizedContainerService.HintSize="476,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_15" sap:VirtualizedContainerService.HintSize="498,706">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_16" sap:VirtualizedContainerService.HintSize="520,1801">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ExcelAppendRange_1" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="ExcelAppendRange_2" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="ExcelSelectRange_1" sap:VirtualizedContainerService.HintSize="314,59" />
+      <sap2010:ViewStateData Id="ExcelSaveWorkbook_1" sap:VirtualizedContainerService.HintSize="314,22" />
+      <sap2010:ViewStateData Id="Sequence_17" sap:VirtualizedContainerService.HintSize="336,499">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ExcelApplicationScope_1" sap:VirtualizedContainerService.HintSize="520,608">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="CloseWindow_1" sap:VirtualizedContainerService.HintSize="314,68" />
+      <sap2010:ViewStateData Id="If_13" sap:VirtualizedContainerService.HintSize="520,215" />
+      <sap2010:ViewStateData Id="Sequence_18" sap:VirtualizedContainerService.HintSize="542,2828">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="OpenBrowser_1" sap:VirtualizedContainerService.HintSize="556,2927" />
+      <sap2010:ViewStateData Id="Sequence_19" sap:VirtualizedContainerService.HintSize="578,3051">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="GetURL2_1" sap:VirtualizedContainerService.HintSize="618,3131" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>
